@@ -15,8 +15,8 @@ func Register(name string, newFunc NewFunc) {
 	factories.Store(name, newFunc)
 }
 
-// Get gets a named store
-func Get(name string, options map[string]interface{}) (Store, error) {
+// New creates a named store
+func New(name string, options map[string]interface{}) (Store, error) {
 	v, found := factories.Load(name)
 	if !found {
 		return nil, errors.New(name + ": not found")
