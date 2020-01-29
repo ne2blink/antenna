@@ -2,18 +2,18 @@ package storage
 
 import "encoding/json"
 
-// Chat is
+// Chat is Telegram chat
 type Chat struct {
 	ID               string
 	SubscribedAppIDs []string
 }
 
-// FromJSON is
+// FromJSON is decoding json to Chat
 func (c *Chat) FromJSON(jsonBytes []byte) error {
 	return json.Unmarshal(jsonBytes, c)
 }
 
-// ToJSON is
+// ToJSON is encoding Chat to json
 func (c Chat) ToJSON() ([]byte, error) {
 	jsonBytes, err := json.Marshal(c)
 	if err != nil {

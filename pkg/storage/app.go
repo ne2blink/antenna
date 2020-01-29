@@ -16,12 +16,12 @@ type App struct {
 	SubscribedChatIDs []string
 }
 
-// FromJSON is
+// FromJSON is decoding json to App
 func (a *App) FromJSON(jsonBytes []byte) error {
 	return json.Unmarshal(jsonBytes, a)
 }
 
-// ToJSON is
+// ToJSON is encoding App to json
 func (a *App) ToJSON() ([]byte, error) {
 	jsonBytes, err := json.Marshal(a)
 	if err != nil {
