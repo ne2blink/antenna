@@ -7,7 +7,7 @@ type AppStore interface {
 	GetApp(ID string) (App, error)
 	DeleteApp(ID string) error
 	ListApps() ([]App, error)
-	ListSubscribers(ID string) ([]string, error)
+	ListSubscribers(ID string) ([]int64, error)
 }
 
 // SubscriberStore provides subscriber storage
