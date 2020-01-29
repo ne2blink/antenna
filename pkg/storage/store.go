@@ -2,7 +2,7 @@ package storage
 
 // AppStore provides app storage
 type AppStore interface {
-	CreateApp(name string) (App, error)
+	CreateApp(App) (string, error)
 	UpdateApp(App) error
 	GetApp(ID string) (App, error)
 	DeleteApp(ID string) error
