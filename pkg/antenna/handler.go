@@ -39,10 +39,6 @@ func (h *handler) handle() error {
 	return nil
 }
 
-func (h *handler) handleStart() error {
-	return h.replyMarkdown("Hi, I'm `Antenna`. Try /list to subscribe applications.")
-}
-
 func (h *handler) handleStop() error {
 	if err := h.base.store.UnsubscribeAll(h.msg.Chat.ID); err != nil {
 		return err
