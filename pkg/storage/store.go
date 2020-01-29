@@ -12,10 +12,10 @@ type AppStore interface {
 
 // SubscriberStore provides subscriber storage
 type SubscriberStore interface {
-	ListSubscribedApps(ChatID string) ([]App, error)
-	Subscribe(ChatID, AppID string) error
-	Unsubscribe(ChatID, AppID string) error
-	UnsubscribeAll(ChatID string) error
+	ListSubscribedApps(ChatID int64) ([]App, error)
+	Subscribe(ChatID int64, AppID string) error
+	Unsubscribe(ChatID int64, AppID string) error
+	UnsubscribeAll(ChatID int64) error
 }
 
 // Store provides storage
