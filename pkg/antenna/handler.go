@@ -86,7 +86,7 @@ func (h *handler) handleAdd(ID string) error {
 	if err := h.base.store.Subscribe(h.msg.Chat.ID, ID); err != nil {
 		return err
 	}
-	return h.replyText(fmt.Sprintf(
+	return h.replyTextWithQuote(fmt.Sprintf(
 		"Successfully subscribed %s: %s.",
 		app.ID,
 		app.Name,
@@ -101,7 +101,7 @@ func (h *handler) handleDelete(ID string) error {
 	if err := h.base.store.Unsubscribe(h.msg.Chat.ID, ID); err != nil {
 		return err
 	}
-	return h.replyText(fmt.Sprintf(
+	return h.replyTextWithQuote(fmt.Sprintf(
 		"Successfully unsubscribed %s: %s.",
 		app.ID,
 		app.Name,
@@ -109,16 +109,21 @@ func (h *handler) handleDelete(ID string) error {
 }
 
 func (h *handler) replyText(text string) error {
-	return h.replyMessage(text, "")
+	return h.replyMessage(text, "", 0)
+}
+
+func (h *handler) replyTextWithQuote(text string) error {
+	return h.replyMessage(text, "", h.msg.MessageID)
 }
 
 func (h *handler) replyMarkdown(text string) error {
-	return h.replyMessage(text, "Markdown")
+	return h.replyMessage(text, "Markdown", 0)
 }
 
-func (h *handler) replyMessage(text string, parseMode string) error {
+func (h *handler) replyMessage(text, parseMode string, msgID int) error {
 	msg := tgbotapi.NewMessage(h.msg.Chat.ID, text)
 	msg.ParseMode = parseMode
+	msg.ReplyToMessageID = msgID
 	_, err := h.base.bot.Send(msg)
 	return err
 }
