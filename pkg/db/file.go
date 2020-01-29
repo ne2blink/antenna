@@ -3,6 +3,7 @@ package db
 import (
 	"fmt"
 	"log"
+	"strconv"
 	"time"
 
 	"github.com/boltdb/bolt"
@@ -10,11 +11,39 @@ import (
 )
 
 type file struct {
-	path string
+	db *bolt.DB
 }
 
 func (f *file) CreateApp(name string) (storage.App, error) {
-	return storage.App{}, nil
+	app := storage.App{Name: name}
+	err := f.db.Update(func(tx *bolt.Tx) error {
+		// Open Apps Bucket
+		b := tx.Bucket([]byte("Apps"))
+		// 生成自增序列
+		id, err := b.NextSequence()
+		if err != nil {
+			return err
+		}
+		fmt.Println(id)
+		app.ID = strconv.FormatUint(id, 10)
+		fmt.Println(app.ID)
+		_, err = app.SetSecret("")
+		if err != nil {
+			return err
+		}
+		// Marshal user data into bytes.
+		buf, err := app.ToJSON()
+		if err != nil {
+			return err
+		}
+		// Persist bytes to users bucket.
+		return b.Put([]byte(app.ID), buf)
+	})
+	if err != nil {
+		return app, err
+	}
+
+	return app, nil
 }
 
 func (f *file) UpdateApp(storage.App) error {
@@ -53,6 +82,10 @@ func (f *file) UnsubscribeAll(ChatID string) error {
 	return nil
 }
 
+func (f *file) Close() error {
+	return f.db.Close()
+}
+
 func createChatsBucket(tx *bolt.Tx) error {
 	_, err := tx.CreateBucketIfNotExists([]byte("Chats"))
 	if err != nil {
@@ -79,24 +112,21 @@ func newFile(options map[string]interface{}) (storage.Store, error) {
 			}
 		}
 	}
-	file := file{path: path}
 
 	db, err := bolt.Open(path, 0600, &bolt.Options{Timeout: 10 * time.Second})
 	if err != nil {
 		log.Fatal(err)
 	}
-	defer db.Close()
-
 	createChatsErr := db.Update(createChatsBucket)
 	if createChatsErr != nil {
 		return nil, createChatsErr
 	}
-
 	createAppsErr := db.Update(createAppsBucket)
 	if createAppsErr != nil {
 		return nil, createAppsErr
 	}
 
+	file := file{db: db}
 	return &file, nil
 }
 
