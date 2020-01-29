@@ -5,7 +5,7 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "Debug Antenna",
+            "name": "Debug Antenna Server",
             "type": "go",
             "request": "launch",
             "mode": "auto",
@@ -13,7 +13,7 @@
             "env": {
                 "ANTENNA_CONFIG": "../../configs/config.yml"
             },
-            "args": []
+            "args": [ "serve" ]
         }
     ]
 }

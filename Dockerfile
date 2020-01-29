@@ -10,4 +10,4 @@ RUN adduser -Dg '' antenna
 WORKDIR /home/antenna
 COPY --from=build /antenna/configs/config.yml config.yml
 USER antenna
-CMD antenna config.yml
+CMD antenna serve -c config.yml
