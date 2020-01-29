@@ -1,7 +1,18 @@
 package main
 
-import "fmt"
+import (
+	"github.com/spf13/cobra"
+)
 
 func main() {
-	fmt.Println("hello world")
+	cmd := &cobra.Command{
+		Use: "antenna [options] [command]",
+	}
+	cmd.PersistentFlags().StringP("config", "c", "", "config file")
+	cmd.MarkPersistentFlagFilename("config", "yaml", "yml")
+	cmd.AddCommand(
+		newAppCommand(),
+		newServeCommand(),
+	)
+	cmd.Execute()
 }
