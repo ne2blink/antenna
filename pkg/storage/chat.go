@@ -4,13 +4,13 @@ import "encoding/json"
 
 // Chat is
 type Chat struct {
-	ID             string
-	SubscribedApps []App
+	ID               string
+	SubscribedAppIDs []string
 }
 
 // FromJSON is
-func (c *Chat) FromJSON(jsonBytes []byte) {
-	json.Unmarshal(jsonBytes, c)
+func (c *Chat) FromJSON(jsonBytes []byte) error {
+	return json.Unmarshal(jsonBytes, c)
 }
 
 // ToJSON is

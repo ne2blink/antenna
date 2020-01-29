@@ -10,15 +10,15 @@ import (
 
 // App represnets an application
 type App struct {
-	ID              string
-	Name            string
-	Secret          string
-	SubscribedChats []Chat
+	ID                string
+	Name              string
+	Secret            string
+	SubscribedChatIDs []string
 }
 
 // FromJSON is
-func (a *App) FromJSON(jsonBytes []byte) {
-	json.Unmarshal(jsonBytes, a)
+func (a *App) FromJSON(jsonBytes []byte) error {
+	return json.Unmarshal(jsonBytes, a)
 }
 
 // ToJSON is
