@@ -3,15 +3,31 @@ package storage
 import (
 	"crypto/rand"
 	"encoding/base64"
+	"encoding/json"
 
 	"golang.org/x/crypto/bcrypt"
 )
 
 // App represnets an application
 type App struct {
-	ID     string
-	Name   string
-	Secret string
+	ID                string
+	Name              string
+	Secret            string
+	SubscribedChatIDs []string
+}
+
+// FromJSON is decoding json to App
+func (a *App) FromJSON(jsonBytes []byte) error {
+	return json.Unmarshal(jsonBytes, a)
+}
+
+// ToJSON is encoding App to json
+func (a *App) ToJSON() ([]byte, error) {
+	jsonBytes, err := json.Marshal(a)
+	if err != nil {
+		return nil, err
+	}
+	return jsonBytes, nil
 }
 
 // SetSecret generates a random secret.
