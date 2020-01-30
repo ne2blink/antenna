@@ -18,7 +18,7 @@ type Server struct {
 }
 
 // New creates a new server instance.
-func New(store storage.Store, antenna *antenna.Antenna, log *zap.SugaredLogger) *Server {
+func New(store storage.AppStore, antenna *antenna.Antenna, log *zap.SugaredLogger) *Server {
 	engine := gin.New()
 	engine.Use(zapLogger(log), gin.Recovery())
 	s := &Server{
