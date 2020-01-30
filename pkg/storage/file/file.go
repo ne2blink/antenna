@@ -108,8 +108,8 @@ func (f file) ListApps() ([]storage.App, error) {
 	return []storage.App{}, nil
 }
 
-func (f file) ListSubscribers(ID string) ([]string, error) {
-	return []string{}, nil
+func (f file) ListSubscribers(ID string) ([]int64, error) {
+	return []int64{}, nil
 }
 
 func (f file) ListSubscribedApps(ChatID int64) ([]storage.App, error) {
