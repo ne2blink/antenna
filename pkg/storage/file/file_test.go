@@ -9,7 +9,7 @@ import (
 
 func Test_file_AppCGUD(t *testing.T) {
 	options := make(map[string]interface{})
-	path := "./db.test"
+	path := "./test.db"
 	options["path"] = path
 	file, err := storage.New("file", options)
 	if err != nil {
@@ -49,7 +49,7 @@ func Test_file_AppCGUD(t *testing.T) {
 
 func Test_file_Subscribe(t *testing.T) {
 	options := make(map[string]interface{})
-	path := "./db.test"
+	path := "./test.db"
 	options["path"] = path
 	file, err := storage.New("file", options)
 	if err != nil {
