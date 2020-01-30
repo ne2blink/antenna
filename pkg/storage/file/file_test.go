@@ -2,6 +2,7 @@ package file
 
 import (
 	"fmt"
+	"os"
 	"testing"
 
 	"github.com/ne2blink/antenna/pkg/storage"
@@ -15,6 +16,8 @@ func Test_file_AppCGUD(t *testing.T) {
 	if err != nil {
 		t.Errorf("%v", err)
 	}
+	defer os.Remove(path)
+	defer file.Close()
 	app := storage.App{}
 	app.Name = "001"
 	app.SetSecret("")
@@ -55,6 +58,8 @@ func Test_file_Subscribe(t *testing.T) {
 	if err != nil {
 		t.Errorf("%v", err)
 	}
+	defer os.Remove(path)
+	defer file.Close()
 	app := storage.App{}
 	app.Name = "001"
 	app.SetSecret("")
