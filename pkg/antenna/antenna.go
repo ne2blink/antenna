@@ -52,7 +52,7 @@ func (a *Antenna) handleMessage(msg *tgbotapi.Message) {
 	defer log.Sync()
 	defer func() {
 		if r := recover(); r != nil {
-			log.Errorw("panic", "error", fmt.Sprint(r))
+			log.Errorw("panic", "err", fmt.Sprint(r))
 		}
 	}()
 
@@ -62,7 +62,7 @@ func (a *Antenna) handleMessage(msg *tgbotapi.Message) {
 		log:  log,
 	}
 	if err := h.handle(); err != nil {
-		log.Errorw(msg.Text, "error", err.Error())
+		log.Errorw(msg.Text, "err", err.Error())
 	} else {
 		log.Info(msg.Text)
 	}
