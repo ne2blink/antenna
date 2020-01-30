@@ -1,5 +1,7 @@
 package storage
 
+import "io"
+
 // AppStore provides app storage
 type AppStore interface {
 	CreateApp(App) (string, error)
@@ -22,4 +24,5 @@ type SubscriberStore interface {
 type Store interface {
 	AppStore
 	SubscriberStore
+	io.Closer
 }
