@@ -1,4 +1,10 @@
+debug:
+    enabled: false
 telegram:
     token: <token>
 storage:
     type: memory
+    options:
+        placeholder: "placeholder"
+http:
+    addr: :80
