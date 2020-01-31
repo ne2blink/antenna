@@ -89,6 +89,7 @@ func createApp(cmd *cobra.Command, _ []string) error {
 	if err != nil {
 		return err
 	}
+	defer store.Close()
 	id, err := store.CreateApp(app)
 	if err != nil {
 		return err
@@ -110,6 +111,7 @@ func updateApp(cmd *cobra.Command, _ []string) error {
 	if err != nil {
 		return err
 	}
+	defer store.Close()
 	app, err := store.GetApp(flagString(cmd, "id"))
 	if err != nil {
 		return err
@@ -145,6 +147,7 @@ func deleteApp(cmd *cobra.Command, _ []string) error {
 	if err != nil {
 		return err
 	}
+	defer store.Close()
 	app, err := store.GetApp(flagString(cmd, "id"))
 	if err != nil {
 		return err
@@ -165,6 +168,7 @@ func listApps(cmd *cobra.Command, _ []string) error {
 	if err != nil {
 		return err
 	}
+	defer store.Close()
 	apps, err := store.ListApps()
 	if err != nil {
 		return err
