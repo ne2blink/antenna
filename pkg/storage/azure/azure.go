@@ -8,13 +8,15 @@ import (
 )
 
 const (
-	tableNameApp = "AntennaApp"
+	tableNameApp          = "AntennaApp"
+	tableNameSubscription = "AntennaSubscription"
 
 	defaultTimeout = 30
 )
 
 type store struct {
-	app *azure.Table
+	app          *azure.Table
+	subscription *azure.Table
 }
 
 // New creates a store based on Azure Storage.
@@ -26,17 +28,20 @@ func New(conn string, shouldInitTables bool) (storage.Store, error) {
 
 	tableCli := cli.GetTableService()
 	tableApp := tableCli.GetTableReference(tableNameApp)
+	tableSubscription := tableCli.GetTableReference(tableNameSubscription)
 
 	if shouldInitTables {
 		if err := initTables(
 			tableApp,
+			tableSubscription,
 		); err != nil {
 			return nil, err
 		}
 	}
 
 	return &store{
-		app: tableApp,
+		app:          tableApp,
+		subscription: tableSubscription,
 	}, nil
 }
 
