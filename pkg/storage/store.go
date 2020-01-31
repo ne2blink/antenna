@@ -6,18 +6,18 @@ import "io"
 type AppStore interface {
 	CreateApp(App) (string, error)
 	UpdateApp(App) error
-	GetApp(ID string) (App, error)
-	DeleteApp(ID string) error
+	GetApp(id string) (App, error)
+	DeleteApp(id string) error
 	ListApps() ([]App, error)
-	ListSubscribers(ID string) ([]int64, error)
+	ListSubscribers(id string) ([]int64, error)
 }
 
 // SubscriberStore provides subscriber storage
 type SubscriberStore interface {
-	ListSubscribedApps(ChatID int64) ([]App, error)
-	Subscribe(ChatID int64, AppID string) error
-	Unsubscribe(ChatID int64, AppID string) error
-	UnsubscribeAll(ChatID int64) error
+	ListSubscribedApps(chatID int64) ([]App, error)
+	Subscribe(chatID int64, appID string) error
+	Unsubscribe(chatID int64, appID string) error
+	UnsubscribeAll(chatID int64) error
 }
 
 // Store provides storage

@@ -87,8 +87,7 @@ func (h *handler) handleAdd(ID string) error {
 		return err
 	}
 	return h.replyTextWithQuote(fmt.Sprintf(
-		"Successfully subscribed %s: %s.",
-		app.ID,
+		"Successfully subscribed %s.",
 		app.Name,
 	))
 }
@@ -102,8 +101,7 @@ func (h *handler) handleDelete(ID string) error {
 		return err
 	}
 	return h.replyTextWithQuote(fmt.Sprintf(
-		"Successfully unsubscribed %s: %s.",
-		app.ID,
+		"Successfully unsubscribed %s.",
 		app.Name,
 	))
 }
