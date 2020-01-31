@@ -23,6 +23,9 @@ func Test_file_AppCGUD(t *testing.T) {
 	app.SetSecret("")
 
 	id, err := file.CreateApp(app)
+	if err != nil {
+		t.Errorf("%v", err)
+	}
 	fmt.Println(app)
 
 	app, err = file.GetApp(id)
@@ -46,7 +49,6 @@ func Test_file_AppCGUD(t *testing.T) {
 	if err == nil {
 		t.Errorf("file storage DeleteApp error")
 	}
-
 	// t.Errorf("Test")
 }
 
@@ -65,15 +67,22 @@ func Test_file_Subscribe(t *testing.T) {
 	app.SetSecret("")
 
 	id, err := file.CreateApp(app)
-	a, err := file.ListSubscribedApps(123)
-	fmt.Println(a)
+	_, err = file.ListSubscribedApps(123)
+	if err != nil {
+		t.Errorf("%v", err)
+	}
 	file.Subscribe(123, id)
-	a, err = file.ListSubscribedApps(123)
-	fmt.Println(a)
-	aa, err := file.GetApp(id)
-	fmt.Println(aa)
-	aaa, err := file.ListSubscribers(id)
-	fmt.Println(aaa)
-
+	_, err = file.ListSubscribedApps(123)
+	if err != nil {
+		t.Errorf("%v", err)
+	}
+	_, err = file.GetApp(id)
+	if err != nil {
+		t.Errorf("%v", err)
+	}
+	_, err = file.ListSubscribers(id)
+	if err != nil {
+		t.Errorf("%v", err)
+	}
 	// t.Errorf("Test")
 }
