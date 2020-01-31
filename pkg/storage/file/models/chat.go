@@ -15,9 +15,5 @@ func (c *Chat) FromJSON(jsonBytes []byte) error {
 
 // ToJSON is encoding Chat to json
 func (c Chat) ToJSON() ([]byte, error) {
-	jsonBytes, err := json.Marshal(c)
-	if err != nil {
-		return nil, err
-	}
-	return jsonBytes, nil
+	return json.Marshal(c)
 }

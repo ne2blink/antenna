@@ -17,7 +17,7 @@ func Test_file_AppCGUD(t *testing.T) {
 		t.Errorf("%v", err)
 	}
 	defer os.Remove(path)
-	// defer file.Close()
+	defer file.Close()
 	app := storage.App{}
 	app.Name = "001"
 	app.SetSecret("")
@@ -61,7 +61,7 @@ func Test_file_Subscribe(t *testing.T) {
 		t.Errorf("%v", err)
 	}
 	defer os.Remove(path)
-	// defer file.Close()
+	defer file.Close()
 	app := storage.App{}
 	app.Name = "001"
 	app.SetSecret("")

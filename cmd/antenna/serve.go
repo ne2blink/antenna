@@ -6,7 +6,6 @@ import (
 	"github.com/ne2blink/antenna/pkg/antenna"
 	"github.com/ne2blink/antenna/pkg/server"
 	"github.com/ne2blink/antenna/pkg/storage"
-	_ "github.com/ne2blink/antenna/pkg/storage/file"
 	"github.com/spf13/cobra"
 	"go.uber.org/zap"
 )

@@ -18,11 +18,7 @@ func (a *App) FromJSON(jsonBytes []byte) error {
 
 // ToJSON is encoding App to json
 func (a App) ToJSON() ([]byte, error) {
-	jsonBytes, err := json.Marshal(a)
-	if err != nil {
-		return nil, err
-	}
-	return jsonBytes, nil
+	return json.Marshal(a)
 }
 
 // FromStoreApp is decoding storage.App to models.App
