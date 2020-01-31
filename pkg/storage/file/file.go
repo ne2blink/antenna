@@ -2,8 +2,6 @@ package file
 
 import (
 	"errors"
-	"fmt"
-	"log"
 	"strconv"
 	"time"
 
@@ -335,7 +333,7 @@ func (f file) Close() error {
 func createChatsBucket(tx *bolt.Tx) error {
 	_, err := tx.CreateBucketIfNotExists([]byte("Chats"))
 	if err != nil {
-		return fmt.Errorf("create bucket: %s", err)
+		return err
 	}
 	return nil
 }
@@ -343,7 +341,7 @@ func createChatsBucket(tx *bolt.Tx) error {
 func createAppsBucket(tx *bolt.Tx) error {
 	_, err := tx.CreateBucketIfNotExists([]byte("Apps"))
 	if err != nil {
-		return fmt.Errorf("create bucket: %s", err)
+		return err
 	}
 	return nil
 }
@@ -361,7 +359,7 @@ func newFile(options map[string]interface{}) (storage.Store, error) {
 
 	db, err := bolt.Open(path, 0600, &bolt.Options{Timeout: 10 * time.Second})
 	if err != nil {
-		log.Fatal(err)
+		return nil, err
 	}
 
 	createChatsErr := db.Update(createChatsBucket)
