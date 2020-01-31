@@ -1,58 +1,52 @@
 package azure
 
-import "github.com/ne2blink/antenna/pkg/storage"
+import (
+	"errors"
+
+	azure "github.com/Azure/azure-sdk-for-go/storage"
+	"github.com/ne2blink/antenna/pkg/storage"
+)
+
+const (
+	tableNameApp = "AntennaApp"
+
+	defaultTimeout = 30
+)
 
 type store struct {
+	app *azure.Table
 }
 
-func (s *store) CreateApp(_ storage.App) (string, error) {
-	panic("not implemented") // TODO: Implement
-}
+// New creates a store based on Azure Storage.
+func New(conn string, shouldInitTables bool) (storage.Store, error) {
+	cli, err := azure.NewClientFromConnectionString(conn)
+	if err != nil {
+		return nil, err
+	}
 
-func (s *store) UpdateApp(_ storage.App) error {
-	panic("not implemented") // TODO: Implement
-}
+	tableCli := cli.GetTableService()
+	tableApp := tableCli.GetTableReference(tableNameApp)
 
-func (s *store) GetApp(ID string) (storage.App, error) {
-	panic("not implemented") // TODO: Implement
-}
+	if shouldInitTables {
+		if err := initTables(
+			tableApp,
+		); err != nil {
+			return nil, err
+		}
+	}
 
-func (s *store) DeleteApp(ID string) error {
-	panic("not implemented") // TODO: Implement
-}
-
-func (s *store) ListApps() ([]storage.App, error) {
-	panic("not implemented") // TODO: Implement
-}
-
-func (s *store) ListSubscribers(ID string) ([]int64, error) {
-	panic("not implemented") // TODO: Implement
-}
-
-func (s *store) ListSubscribedApps(ChatID int64) ([]storage.App, error) {
-	panic("not implemented") // TODO: Implement
-}
-
-func (s *store) Subscribe(ChatID int64, AppID string) error {
-	panic("not implemented") // TODO: Implement
-}
-
-func (s *store) Unsubscribe(ChatID int64, AppID string) error {
-	panic("not implemented") // TODO: Implement
-}
-
-func (s *store) UnsubscribeAll(ChatID int64) error {
-	panic("not implemented") // TODO: Implement
-}
-
-func (s *store) Close() error {
-	panic("not implemented") // TODO: Implement
-}
-
-func newStore(options map[string]interface{}) (storage.Store, error) {
-	return &store{}, nil
+	return &store{
+		app: tableApp,
+	}, nil
 }
 
 func init() {
-	storage.Register("azure", newStore)
+	storage.Register("azure", func(options map[string]interface{}) (storage.Store, error) {
+		conn, _ := options["conn"].(string)
+		if conn == "" {
+			return nil, errors.New("azure: missing connection string")
+		}
+		notInitTables, _ := options["no_init"].(bool)
+		return New(conn, !notInitTables)
+	})
 }
