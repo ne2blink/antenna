@@ -58,3 +58,10 @@ func splitStringSlice(s []string, l int) ([]string, []string) {
 	}
 	return s, nil
 }
+
+func splitInt64Slice(s []int64, l int) ([]int64, []int64) {
+	if len(s) > l {
+		return s[:l], s[l:]
+	}
+	return s, nil
+}

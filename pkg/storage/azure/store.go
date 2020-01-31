@@ -41,9 +41,31 @@ func (s *store) GetApp(id string) (storage.App, error) {
 	return appFromEntity(entity), nil
 }
 
-func (s *store) DeleteApp(id string) error {
-	entity := s.getAppReference(id)
-	return entity.Delete(true, nil)
+func (s *store) DeleteApp(appID string) error {
+	entity := s.getAppReference(appID)
+	if err := entity.Delete(true, nil); err != nil {
+		return err
+	}
+
+	chatIDs, err := s.ListSubscribers(appID)
+	if err != nil {
+		return err
+	}
+
+	var eg errGroup
+	for len(chatIDs) > 0 {
+		var ids []int64
+		ids, chatIDs = splitInt64Slice(chatIDs, 50)
+		batch := s.subscription.NewBatch()
+		for _, chatID := range ids {
+			entities := s.getSubscriptionReference(chatID, appID)
+			for _, entity := range entities {
+				batch.DeleteEntity(entity, true)
+			}
+		}
+		eg.Append(batch.ExecuteBatch())
+	}
+	return eg.Simplify()
 }
 
 func (s *store) ListApps() ([]storage.App, error) {
