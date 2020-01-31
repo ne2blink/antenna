@@ -6,10 +6,10 @@ import "io"
 type AppStore interface {
 	CreateApp(App) (string, error)
 	UpdateApp(App) error
-	GetApp(ID string) (App, error)
-	DeleteApp(ID string) error
+	GetApp(id string) (App, error)
+	DeleteApp(id string) error
 	ListApps() ([]App, error)
-	ListSubscribers(ID string) ([]int64, error)
+	ListSubscribers(id string) ([]int64, error)
 }
 
 // SubscriberStore provides subscriber storage
