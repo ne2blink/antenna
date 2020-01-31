@@ -11,7 +11,7 @@ func initTables(tables ...*azure.Table) error {
 	for _, table := range tables {
 		if err := table.Create(defaultTimeout, azure.NoMetadata, nil); err != nil {
 			if err, ok := err.(azure.AzureStorageServiceError); ok && err.Code == "TableAlreadyExists" {
-				return nil
+				continue
 			}
 			return errors.New(table.Name + ": " + err.Error())
 		}

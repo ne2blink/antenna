@@ -1,6 +1,7 @@
 package main
 
 import (
+	"github.com/gin-gonic/gin"
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api"
 	"github.com/ne2blink/antenna/pkg/antenna"
 	"github.com/ne2blink/antenna/pkg/server"
@@ -29,6 +30,7 @@ func serve(cmd *cobra.Command, _ []string) error {
 		log, err = zap.NewDevelopment()
 	} else {
 		log, err = zap.NewProduction()
+		gin.SetMode(gin.ReleaseMode)
 	}
 	if err != nil {
 		return err

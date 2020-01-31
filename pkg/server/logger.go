@@ -13,7 +13,7 @@ func zapLogger(log *zap.SugaredLogger) gin.HandlerFunc {
 		c.Next()
 		duration := time.Since(start).Seconds()
 		status := c.Writer.Status()
-		log = log.With(
+		log := log.With(
 			"remote", c.ClientIP(),
 			"host", c.Request.Host,
 			"method", c.Request.Method,

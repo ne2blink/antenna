@@ -84,7 +84,7 @@ func (s *store) ListApps() ([]storage.App, error) {
 
 func (s *store) ListSubscribers(id string) ([]int64, error) {
 	filter := "PartitionKey eq 'app_" + id + "'"
-	entities, err := queryEntities(s.app, filter)
+	entities, err := queryEntities(s.subscription, filter)
 	if err != nil {
 		return nil, err
 	}
@@ -126,7 +126,7 @@ func (s *store) ListSubscribedApps(chatID int64) ([]storage.App, error) {
 
 func (s *store) listSubscribedAppID(chatID int64) ([]string, error) {
 	filter := "PartitionKey eq 'chat_" + strconv.FormatInt(chatID, 10) + "'"
-	entities, err := queryEntities(s.app, filter)
+	entities, err := queryEntities(s.subscription, filter)
 	if err != nil {
 		return nil, err
 	}
