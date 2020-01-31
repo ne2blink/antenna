@@ -19,8 +19,14 @@ func initTables(tables ...*azure.Table) error {
 	return nil
 }
 
-func queryEntities(table *azure.Table) ([]*azure.Entity, error) {
-	result, err := table.QueryEntities(defaultTimeout, azure.MinimalMetadata, nil)
+func queryEntities(table *azure.Table, filter string) ([]*azure.Entity, error) {
+	result, err := table.QueryEntities(
+		defaultTimeout,
+		azure.MinimalMetadata,
+		&azure.QueryOptions{
+			Filter: filter,
+		},
+	)
 	if err != nil {
 		return nil, err
 	}
@@ -44,4 +50,11 @@ func appFromEntity(entity *azure.Entity) storage.App {
 		Name:   name,
 		Secret: secret,
 	}
+}
+
+func splitStringSlice(s []string, l int) ([]string, []string) {
+	if len(s) > l {
+		return s[:l], s[l:]
+	}
+	return s, nil
 }
