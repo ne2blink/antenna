@@ -143,7 +143,11 @@ func (s *store) Subscribe(chatID int64, appID string) error {
 	entities := s.getSubscriptionReference(chatID, appID)
 	var eg errGroup
 	for _, entity := range entities {
-		eg.Append(entity.Insert(azure.EmptyPayload, nil))
+		if err := entity.Insert(azure.EmptyPayload, nil); err != nil {
+			if err, ok := err.(azure.AzureStorageServiceError); ok && err.Code != "EntityAlreadyExists" {
+				eg.Append(err)
+			}
+		}
 	}
 	return eg.Simplify()
 }
