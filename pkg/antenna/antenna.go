@@ -36,10 +36,12 @@ func (a *Antenna) Listen() error {
 	}
 
 	for update := range updates {
-		if update.Message == nil {
-			continue
+		switch {
+		case update.CallbackQuery != nil:
+			go a.handleCallback(update.CallbackQuery)
+		case update.Message != nil:
+			go a.handleMessage(update.Message)
 		}
-		go a.handleMessage(update.Message)
 	}
 	return nil
 }
@@ -65,5 +67,29 @@ func (a *Antenna) handleMessage(msg *tgbotapi.Message) {
 		log.Errorw(msg.Text, "err", err.Error())
 	} else {
 		log.Info(msg.Text)
+	}
+}
+
+func (a *Antenna) handleCallback(cb *tgbotapi.CallbackQuery) {
+	log := a.log.With(
+		"username", cb.From.UserName,
+		"chat_id", cb.Message.Chat.ID,
+	)
+	defer log.Sync()
+	defer func() {
+		if r := recover(); r != nil {
+			log.Errorw("panic", "err", fmt.Sprint(r))
+		}
+	}()
+
+	h := &callback{
+		base: a,
+		cb:   cb,
+		log:  log,
+	}
+	if err := h.handle(); err != nil {
+		log.Errorw(cb.Data, "err", err.Error())
+	} else {
+		log.Info(cb.Data)
 	}
 }
