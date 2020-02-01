@@ -32,10 +32,11 @@ func (a *App) FromStoreApp(app storage.App) {
 
 // ToStoreApp is encoding models.App to storage.App
 func (a App) ToStoreApp() storage.App {
-	var app storage.App
-	app.ID = a.ID
-	app.Name = a.Name
-	app.Secret = a.Secret
-	app.Private = a.Private
+	app := storage.App{
+		ID:      a.ID,
+		Name:    a.Name,
+		Secret:  a.Secret,
+		Private: a.Private,
+	}
 	return app
 }
