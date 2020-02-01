@@ -19,6 +19,10 @@ func flagBool(cmd *cobra.Command, name string) bool {
 	return value
 }
 
+func flagBoolC(cmd *cobra.Command, name string) (bool, bool) {
+	return flagBool(cmd, name), cmd.Flag(name).Changed
+}
+
 func getConfig(cmd *cobra.Command) (*viper.Viper, error) {
 	return config.New(flagString(cmd, "config"))
 }
