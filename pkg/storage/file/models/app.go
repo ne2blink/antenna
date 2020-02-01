@@ -2,6 +2,7 @@ package models
 
 import (
 	"encoding/json"
+
 	"github.com/ne2blink/antenna/pkg/storage"
 )
 
@@ -26,6 +27,7 @@ func (a *App) FromStoreApp(app storage.App) {
 	a.ID = app.ID
 	a.Name = app.Name
 	a.Secret = app.Secret
+	a.Private = app.Private
 }
 
 // ToStoreApp is encoding models.App to storage.App
@@ -34,5 +36,6 @@ func (a App) ToStoreApp() storage.App {
 	app.ID = a.ID
 	app.Name = a.Name
 	app.Secret = a.Secret
+	app.Private = a.Private
 	return app
 }

@@ -41,7 +41,7 @@ func (s store) CreateApp(app storage.App) (string, error) {
 func (s store) UpdateApp(app storage.App) error {
 	var mApp models.App
 	mApp.FromStoreApp(app)
-	err := s.db.Update(func(tx *bolt.Tx) error {
+	return s.db.Update(func(tx *bolt.Tx) error {
 		// Open Apps Bucket
 		bucket := tx.Bucket([]byte("Apps"))
 		// Marshal app data into bytes.
@@ -52,7 +52,6 @@ func (s store) UpdateApp(app storage.App) error {
 		// Persist bytes to users bucket.
 		return bucket.Put([]byte(mApp.ID), buf)
 	})
-	return err
 }
 
 func (s store) GetApp(id string) (storage.App, error) {
@@ -66,16 +65,18 @@ func (s store) GetApp(id string) (storage.App, error) {
 		}
 		return mApp.FromJSON(value)
 	})
-	return mApp.ToStoreApp(), err
+	if err != nil {
+		return storage.App{}, err
+	}
+	return mApp.ToStoreApp(), nil
 }
 
 func (s store) DeleteApp(id string) error {
-	err := s.db.Update(func(tx *bolt.Tx) error {
+	return s.db.Update(func(tx *bolt.Tx) error {
 		// Open Apps Bucket
 		bucket := tx.Bucket([]byte("Apps"))
 		return bucket.Delete([]byte(id))
 	})
-	return err
 }
 
 func (s store) ListApps() ([]storage.App, error) {
@@ -94,7 +95,10 @@ func (s store) ListApps() ([]storage.App, error) {
 		}
 		return nil
 	})
-	return apps, err
+	if err != nil {
+		return []storage.App{}, err
+	}
+	return apps, nil
 }
 
 func (s store) ListSubscribers(id string) ([]int64, error) {
@@ -108,7 +112,10 @@ func (s store) ListSubscribers(id string) ([]int64, error) {
 		}
 		return mApp.FromJSON(value)
 	})
-	return mApp.SubscribedChatIDs, err
+	if err != nil {
+		return []int64{}, err
+	}
+	return mApp.SubscribedChatIDs, nil
 }
 
 func (s store) ListSubscribedApps(chatID int64) ([]storage.App, error) {
@@ -141,7 +148,10 @@ func (s store) ListSubscribedApps(chatID int64) ([]storage.App, error) {
 		}
 		return nil
 	})
-	return apps, err
+	if err != nil {
+		return []storage.App{}, err
+	}
+	return apps, nil
 }
 
 func (s store) Subscribe(chatID int64, appID string) error {
@@ -154,7 +164,7 @@ func (s store) Subscribe(chatID int64, appID string) error {
 	if err != nil {
 		return errors.New(appID + ": not found")
 	}
-	err = s.db.Batch(func(tx *bolt.Tx) error {
+	return s.db.Batch(func(tx *bolt.Tx) error {
 		bucket := tx.Bucket([]byte("Chats"))
 		value := bucket.Get(utils.Int64ToBytes(chatID))
 		if value == nil {
@@ -190,7 +200,6 @@ func (s store) Subscribe(chatID int64, appID string) error {
 		}
 		return bucket.Put([]byte(appID), buf)
 	})
-	return err
 }
 
 func (s store) Unsubscribe(chatID int64, appID string) error {
@@ -203,7 +212,7 @@ func (s store) Unsubscribe(chatID int64, appID string) error {
 	if err != nil {
 		return errors.New(appID + ": not found")
 	}
-	err = s.db.Batch(func(tx *bolt.Tx) error {
+	return s.db.Batch(func(tx *bolt.Tx) error {
 		bucket := tx.Bucket([]byte("Chats"))
 		value := bucket.Get(utils.Int64ToBytes(chatID))
 		if value == nil {
@@ -236,7 +245,6 @@ func (s store) Unsubscribe(chatID int64, appID string) error {
 		}
 		return bucket.Put([]byte(appID), buf)
 	})
-	return err
 }
 
 func (s store) UnsubscribeAll(chatID int64) error {
@@ -245,7 +253,7 @@ func (s store) UnsubscribeAll(chatID int64) error {
 	if err != nil {
 		s.createChat(chatID)
 	}
-	err = s.db.Batch(func(tx *bolt.Tx) error {
+	return s.db.Batch(func(tx *bolt.Tx) error {
 		bucket := tx.Bucket([]byte("Chats"))
 		value := bucket.Get(utils.Int64ToBytes(chatID))
 		if value == nil {
@@ -285,7 +293,6 @@ func (s store) UnsubscribeAll(chatID int64) error {
 		}
 		return nil
 	})
-	return err
 }
 
 func (s store) Close() error {
@@ -293,7 +300,7 @@ func (s store) Close() error {
 }
 
 func (s store) checkAppID(id string) error {
-	err := s.db.View(func(tx *bolt.Tx) error {
+	return s.db.View(func(tx *bolt.Tx) error {
 		bucket := tx.Bucket([]byte("Apps"))
 		value := bucket.Get([]byte(id))
 		if value == nil {
@@ -301,11 +308,10 @@ func (s store) checkAppID(id string) error {
 		}
 		return nil
 	})
-	return err
 }
 
 func (s store) checkChatID(chatID int64) error {
-	err := s.db.View(func(tx *bolt.Tx) error {
+	return s.db.View(func(tx *bolt.Tx) error {
 		bucket := tx.Bucket([]byte("Chats"))
 		value := bucket.Get(utils.Int64ToBytes(chatID))
 		if value == nil {
@@ -313,11 +319,10 @@ func (s store) checkChatID(chatID int64) error {
 		}
 		return nil
 	})
-	return err
 }
 
 func (s store) createChat(chatID int64) error {
-	err := s.db.Update(func(tx *bolt.Tx) error {
+	return s.db.Update(func(tx *bolt.Tx) error {
 		chat := models.Chat{ID: chatID}
 		buf, err := chat.ToJSON()
 		if err != nil {
@@ -326,5 +331,4 @@ func (s store) createChat(chatID int64) error {
 		bucket := tx.Bucket([]byte("Chats"))
 		return bucket.Put(utils.Int64ToBytes(chatID), []byte(buf))
 	})
-	return err
 }

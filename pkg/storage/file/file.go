@@ -13,14 +13,9 @@ var (
 
 func newFileStore(options map[string]interface{}) (storage.Store, error) {
 	// init options
-	path := "./file.db"
-	for k, v := range options {
-		switch k {
-		case "path":
-			if s, ok := v.(string); ok {
-				path = s
-			}
-		}
+	path, _ := options["path"].(string)
+	if path == "" {
+		path = "file.db"
 	}
 	// open database
 	db, err := bolt.Open(path, 0600, &bolt.Options{Timeout: 1 * time.Second})
@@ -33,10 +28,7 @@ func newFileStore(options map[string]interface{}) (storage.Store, error) {
 	for _, v := range bucket {
 		err := file.db.Update(func(tx *bolt.Tx) error {
 			_, err := tx.CreateBucketIfNotExists([]byte(v))
-			if err != nil {
-				return err
-			}
-			return nil
+			return err
 		})
 		if err != nil {
 			return nil, err
