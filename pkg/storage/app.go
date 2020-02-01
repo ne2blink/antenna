@@ -9,9 +9,10 @@ import (
 
 // App represnets an application
 type App struct {
-	ID     string `json:"id,omitempty"`
-	Name   string `json:"name,omitempty"`
-	Secret string `json:"secret,omitempty"`
+	ID      string `json:"id,omitempty"`
+	Name    string `json:"name,omitempty"`
+	Secret  string `json:"secret,omitempty"`
+	Private bool   `json:"private,omitempty"`
 }
 
 // SetSecret generates a random secret.

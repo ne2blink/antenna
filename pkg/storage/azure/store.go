@@ -10,26 +10,13 @@ import (
 )
 
 func (s *store) CreateApp(app storage.App) (string, error) {
-	id := base64.RawURLEncoding.EncodeToString(uuid.NewV4().Bytes())
-
-	entity := s.getAppReference(id)
-	entity.Properties = map[string]interface{}{
-		"name":   app.Name,
-		"secret": app.Secret,
-	}
-	if err := entity.Insert(azure.EmptyPayload, nil); err != nil {
-		return "", err
-	}
-
-	return id, nil
+	app.ID = base64.RawURLEncoding.EncodeToString(uuid.NewV4().Bytes())
+	entity := s.getAppReferenceFromApp(app)
+	return app.ID, entity.Insert(azure.EmptyPayload, nil)
 }
 
 func (s *store) UpdateApp(app storage.App) error {
-	entity := s.getAppReference(app.ID)
-	entity.Properties = map[string]interface{}{
-		"name":   app.Name,
-		"secret": app.Secret,
-	}
+	entity := s.getAppReferenceFromApp(app)
 	return entity.Update(true, nil)
 }
 
@@ -189,6 +176,16 @@ func (s *store) Close() error {
 
 func (s *store) getAppReference(id string) *azure.Entity {
 	return s.app.GetEntityReference(id, "-")
+}
+
+func (s *store) getAppReferenceFromApp(app storage.App) *azure.Entity {
+	entity := s.getAppReference(app.ID)
+	entity.Properties = map[string]interface{}{
+		"name":    app.Name,
+		"secret":  app.Secret,
+		"private": app.Private,
+	}
+	return entity
 }
 
 func (s *store) getSubscriptionReference(chatID int64, appID string) []*azure.Entity {
