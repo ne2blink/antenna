@@ -56,15 +56,22 @@ func (h *handler) handleAll() error {
 	if err != nil {
 		return err
 	}
+	private := h.msg.CommandArguments() == "private"
 
 	lines := []string{
 		"Click one application to subscribe:",
 	}
 	for _, app := range apps {
-		lines = append(lines, fmt.Sprintf("/add_%s %s", app.ID, app.Name))
+		if app.Private == private {
+			lines = append(lines, fmt.Sprintf("/add_%s %s", app.ID, app.Name))
+		}
 	}
+	text := strings.Join(lines, "\n")
 
-	return h.replyText(strings.Join(lines, "\n"))
+	if private {
+		return h.replyTextWithQuote(text)
+	}
+	return h.replyText(text)
 }
 
 func (h *handler) handleList() error {
@@ -88,6 +95,22 @@ func (h *handler) handleAdd(ID string) error {
 	if err != nil {
 		return err
 	}
+
+	// Check if app is private
+	if app.Private {
+		secret := h.msg.CommandArguments()
+		h.msg.Text = h.msg.CommandWithAt() + " ***" // sanitize secret
+		if secret == "" || !app.VerifySecret(secret) {
+			if err := h.replyMarkdownWithQuote(
+				"`Unauthorized` Invalid application secret.",
+			); err != nil {
+				return err
+			}
+			return warning(errors.New("unauthorized: app: " + app.ID))
+		}
+	}
+
+	// Subscribe
 	if err := h.base.store.Subscribe(h.msg.Chat.ID, ID); err != nil {
 		return err
 	}
@@ -123,6 +146,10 @@ func (h *handler) replyMarkdown(text string) error {
 	return h.replyMessage(text, "Markdown", 0)
 }
 
+func (h *handler) replyMarkdownWithQuote(text string) error {
+	return h.replyMessage(text, "Markdown", h.msg.MessageID)
+}
+
 func (h *handler) replyMessage(text, parseMode string, msgID int) error {
 	msg := tgbotapi.NewMessage(h.msg.Chat.ID, text)
 	msg.ParseMode = parseMode
@@ -139,16 +166,10 @@ func (h *handler) auth() error {
 		return nil
 	}
 
-	msg := tgbotapi.NewMessage(
-		h.msg.Chat.ID,
+	if err := h.replyMarkdownWithQuote(
 		"`Unauthorized` Operations are *restricted* to administrators.",
-	)
-	msg.ParseMode = "Markdown"
-	msg.ReplyToMessageID = h.msg.MessageID
-	_, err := h.base.bot.Send(msg)
-	if err != nil {
+	); err != nil {
 		return err
 	}
-
 	return warning(errors.New("unauthorized"))
 }
