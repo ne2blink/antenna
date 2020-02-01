@@ -3,7 +3,7 @@ debug:
 telegram:
     token: <token>
 storage:
-    type: memory
+    type: file
     options:
         placeholder: "placeholder"
 http:

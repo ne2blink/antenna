@@ -7,6 +7,7 @@ require (
 	github.com/Azure/go-autorest/autorest v0.9.4 // indirect
 	github.com/Azure/go-autorest/autorest/adal v0.8.1 // indirect
 	github.com/Azure/go-autorest/autorest/to v0.3.0 // indirect
+	github.com/boltdb/bolt v1.3.1
 	github.com/dnaeon/go-vcr v1.0.1 // indirect
 	github.com/gin-gonic/gin v1.5.0
 	github.com/go-playground/universal-translator v0.17.0 // indirect
