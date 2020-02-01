@@ -7,7 +7,7 @@ storage:
     options:
         placeholder: "placeholder"
 http:
-    addr: :80
+    addr: :8080
 admin:
     enabled: false
     usernames:
