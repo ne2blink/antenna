@@ -8,3 +8,8 @@ storage:
         placeholder: "placeholder"
 http:
     addr: :80
+admin:
+    enabled: false
+    usernames:
+        - user1
+        - user2
