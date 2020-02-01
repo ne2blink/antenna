@@ -27,6 +27,7 @@ func newAppCommand() *cobra.Command {
 		flags := cmd.Flags()
 		flags.StringP("name", "n", "", "app name (required)")
 		flags.StringP("secret", "s", "", "app secret")
+		flags.BoolP("private", "p", false, "set app as private")
 		cmd.MarkFlagRequired("name")
 		appCmd.AddCommand(cmd)
 	}
@@ -43,6 +44,7 @@ func newAppCommand() *cobra.Command {
 		flags.StringP("name", "n", "", "new app name")
 		flags.StringP("secret", "s", "", "new app secret (combined with -r)")
 		flags.BoolP("rotate-secret", "r", false, "rotate app secret")
+		flags.BoolP("private", "p", false, "set app as private")
 		appCmd.AddCommand(cmd)
 	}
 	{
@@ -77,7 +79,8 @@ func createApp(cmd *cobra.Command, _ []string) error {
 
 	// Construct App
 	app := storage.App{
-		Name: name,
+		Name:    name,
+		Private: flagBool(cmd, "private"),
 	}
 	secret, err := app.SetSecret(flagString(cmd, "secret"))
 	if err != nil {
@@ -96,11 +99,8 @@ func createApp(cmd *cobra.Command, _ []string) error {
 	}
 
 	// Reconstruct App with raw secret
-	app = storage.App{
-		ID:     id,
-		Name:   name,
-		Secret: secret,
-	}
+	app.ID = id
+	app.Secret = secret
 
 	return printJSON(app)
 }
@@ -129,6 +129,10 @@ func updateApp(cmd *cobra.Command, _ []string) error {
 		if err != nil {
 			return err
 		}
+		updated = true
+	}
+	if private, isSet := flagBoolC(cmd, "private"); isSet {
+		app.Private = private
 		updated = true
 	}
 	if updated {

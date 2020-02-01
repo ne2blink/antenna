@@ -45,10 +45,12 @@ func queryEntities(table *azure.Table, filter string) ([]*azure.Entity, error) {
 func appFromEntity(entity *azure.Entity) storage.App {
 	name, _ := entity.Properties["name"].(string)
 	secret, _ := entity.Properties["secret"].(string)
+	private, _ := entity.Properties["private"].(bool)
 	return storage.App{
-		ID:     entity.PartitionKey,
-		Name:   name,
-		Secret: secret,
+		ID:      entity.PartitionKey,
+		Name:    name,
+		Secret:  secret,
+		Private: private,
 	}
 }
 
