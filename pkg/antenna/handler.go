@@ -1,6 +1,7 @@
 package antenna
 
 import (
+	"errors"
 	"fmt"
 	"strings"
 
@@ -15,6 +16,10 @@ type handler struct {
 }
 
 func (h *handler) handle() error {
+	if err := h.auth(); err != nil {
+		return err
+	}
+
 	cmd := h.msg.Command()
 	switch cmd {
 	case "start":
@@ -124,4 +129,26 @@ func (h *handler) replyMessage(text, parseMode string, msgID int) error {
 	msg.ReplyToMessageID = msgID
 	_, err := h.base.bot.Send(msg)
 	return err
+}
+
+func (h *handler) auth() error {
+	if h.base.admins == nil {
+		return nil
+	}
+	if _, ok := h.base.admins[h.msg.From.UserName]; ok {
+		return nil
+	}
+
+	msg := tgbotapi.NewMessage(
+		h.msg.Chat.ID,
+		"`Unauthorized` Operations are *restricted* to administrators.",
+	)
+	msg.ParseMode = "Markdown"
+	msg.ReplyToMessageID = h.msg.MessageID
+	_, err := h.base.bot.Send(msg)
+	if err != nil {
+		return err
+	}
+
+	return warning(errors.New("unauthorized"))
 }

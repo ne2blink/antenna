@@ -11,9 +11,10 @@ import (
 
 // Antenna is a telegram bot implemented in Golang, broadcasting message to subscribers.
 type Antenna struct {
-	bot   *tgbotapi.BotAPI
-	store storage.Store
-	log   *zap.SugaredLogger
+	bot    *tgbotapi.BotAPI
+	store  storage.Store
+	log    *zap.SugaredLogger
+	admins map[string]struct{}
 }
 
 // New creates a new Antenna instance.
@@ -63,11 +64,7 @@ func (a *Antenna) handleMessage(msg *tgbotapi.Message) {
 		msg:  msg,
 		log:  log,
 	}
-	if err := h.handle(); err != nil {
-		log.Errorw(msg.Text, "err", err.Error())
-	} else {
-		log.Info(msg.Text)
-	}
+	logEvent(log, msg.Text, h.handle())
 }
 
 func (a *Antenna) handleCallback(cb *tgbotapi.CallbackQuery) {
@@ -87,9 +84,15 @@ func (a *Antenna) handleCallback(cb *tgbotapi.CallbackQuery) {
 		cb:   cb,
 		log:  log,
 	}
-	if err := h.handle(); err != nil {
-		log.Errorw(cb.Data, "err", err.Error())
-	} else {
-		log.Info(cb.Data)
+	logEvent(log, cb.Data, h.handle())
+}
+
+// AddAdmin enables admin feature and adds add admins.
+func (a *Antenna) AddAdmin(usernames ...string) {
+	if a.admins == nil {
+		a.admins = make(map[string]struct{})
+	}
+	for _, username := range usernames {
+		a.admins[username] = struct{}{}
 	}
 }

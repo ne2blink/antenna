@@ -52,6 +52,9 @@ func serve(cmd *cobra.Command, _ []string) error {
 	defer store.Close()
 
 	antenna := antenna.New(bot, store, sugar.With("service", "antenna"))
+	if config.GetBool("admin.enabled") {
+		antenna.AddAdmin(config.GetStringSlice("admin.usernames")...)
+	}
 	go antenna.Listen()
 
 	server := server.New(store, antenna, sugar.With("service", "server"))
