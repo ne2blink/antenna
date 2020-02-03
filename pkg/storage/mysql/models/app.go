@@ -6,6 +6,7 @@ import (
 	"github.com/ne2blink/antenna/pkg/storage"
 )
 
+// App is an application for mysql table
 type App struct {
 	ID      uint `gorm:"primary_key"`
 	Name    string

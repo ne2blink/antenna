@@ -18,7 +18,7 @@ func newStore(options map[string]interface{}) (storage.Store, error) {
 	if err != nil {
 		return nil, err
 	}
-	db.AutoMigrate(&models.App{}, &models.AppSub{}, &models.ChatSub{})
+	db.AutoMigrate(&models.App{}, &models.Sub{})
 
 	return &store{db: db}, nil
 }

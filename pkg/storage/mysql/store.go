@@ -40,12 +40,7 @@ func (s store) DeleteApp(id string) error {
 	mApp := models.App{}
 	mApp.FromStoreApp(storage.App{ID: id})
 	tx := s.db.Begin()
-	err := tx.Where("app_id = ?", id).Delete(models.AppSub{}).Error
-	if err != nil {
-		tx.Rollback()
-		return err
-	}
-	err = tx.Where("app_id = ?", id).Delete(models.ChatSub{}).Error
+	err := tx.Where("app_id = ?", id).Delete(models.Sub{}).Error
 	if err != nil {
 		tx.Rollback()
 		return err
@@ -69,25 +64,25 @@ func (s store) ListApps() ([]storage.App, error) {
 
 func (s store) ListSubscribers(id string) ([]int64, error) {
 	chats := []int64{}
-	appSubs := []models.AppSub{}
-	err := s.db.Where("app_id = ?", id).Find(&appSubs).Error
+	subs := []models.Sub{}
+	err := s.db.Where("app_id = ?", id).Find(&subs).Error
 	if err != nil {
 		return []int64{}, err
 	}
-	for _, appSub := range appSubs {
+	for _, appSub := range subs {
 		chats = append(chats, appSub.ChatID)
 	}
 	return chats, nil
 }
 
 func (s store) ListSubscribedApps(chatID int64) ([]storage.App, error) {
-	chatSubs := []models.AppSub{}
+	subs := []models.Sub{}
 	apps := []storage.App{}
-	err := s.db.Where("chat_id = ?", chatID).Find(&chatSubs).Error
+	err := s.db.Where("chat_id = ?", chatID).Find(&subs).Error
 	if err != nil {
 		return []storage.App{}, err
 	}
-	for _, chatSub := range chatSubs {
+	for _, chatSub := range subs {
 		app := storage.App{ID: chatSub.AppID}
 		err := s.db.First(&app).Error
 		if err != nil {
@@ -102,51 +97,20 @@ func (s store) Subscribe(chatID int64, appID string) error {
 	if s.checkChatAndApp(chatID, appID) {
 		return errors.New("Already Subscribed")
 	}
-	tx := s.db.Begin()
-	appSub := models.AppSub{ChatID: chatID, AppID: appID}
-	chatSub := models.ChatSub{ChatID: chatID, AppID: appID}
-	err := tx.Create(&appSub).Error
-	if err != nil {
-		tx.Rollback()
-		return err
-	}
-	err = tx.Create(&chatSub).Error
-	if err != nil {
-		tx.Rollback()
-		return err
-	}
-	return tx.Commit().Error
+	sub := models.Sub{ChatID: chatID, AppID: appID}
+	return s.db.Create(&sub).Error
+
 }
 
 func (s store) Unsubscribe(chatID int64, appID string) error {
 	if !s.checkChatAndApp(chatID, appID) {
 		return errors.New("Not Subscribed")
 	}
-	tx := s.db.Begin()
-	err := tx.Where("chat_id = ?", chatID).Where("app_id = ?", appID).Delete(&models.AppSub{}).Error
-	if err != nil {
-		tx.Rollback()
-		return err
-	}
-	err = tx.Where("chat_id = ?", chatID).Where("app_id = ?", appID).Delete(&models.ChatSub{}).Error
-	if err != nil {
-		tx.Rollback()
-		return err
-	}
-	return tx.Commit().Error
+	return s.db.Where("chat_id = ?", chatID).Where("app_id = ?", appID).Delete(&models.Sub{}).Error
 }
 
 func (s store) UnsubscribeAll(chatID int64) error {
-	tx := s.db.Begin()
-	err := tx.Where("chat_id = ?", chatID).Delete(&models.AppSub{}).Error
-	if err != nil {
-		return err
-	}
-	err = tx.Where("chat_id = ?", chatID).Delete(&models.ChatSub{}).Error
-	if err != nil {
-		return err
-	}
-	return tx.Commit().Error
+	return s.db.Where("chat_id = ?", chatID).Delete(&models.Sub{}).Error
 }
 
 func (s store) Close() error {
@@ -154,8 +118,8 @@ func (s store) Close() error {
 }
 
 func (s store) checkChatAndApp(chatID int64, appID string) bool {
-	chatSub := models.ChatSub{}
-	if err := s.db.Where("chat_id = ?", chatID).Where("app_id = ?", appID).First(&chatSub).Error; err != nil {
+	sub := models.Sub{}
+	if err := s.db.Where("chat_id = ?", chatID).Where("app_id = ?", appID).First(&sub).Error; err != nil {
 		return false
 	}
 	return true
