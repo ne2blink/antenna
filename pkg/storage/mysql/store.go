@@ -1,8 +1,6 @@
 package mysql
 
 import (
-	"errors"
-
 	"github.com/jinzhu/gorm"
 	"github.com/ne2blink/antenna/pkg/storage"
 	"github.com/ne2blink/antenna/pkg/storage/mysql/models"
@@ -36,18 +34,19 @@ func (s store) GetApp(id string) (storage.App, error) {
 	return app, nil
 }
 
-func (s store) DeleteApp(id string) error {
+func (s store) DeleteApp(id string) (err error) {
 	mApp := models.App{}
 	mApp.FromStoreApp(storage.App{ID: id})
 	tx := s.db.Begin()
-	err := tx.Where("app_id = ?", id).Delete(models.Sub{}).Error
-	if err != nil {
-		tx.Rollback()
+	defer func() {
+		if err != nil {
+			tx.Rollback()
+		}
+	}()
+	if err := tx.Where("app_id = ?", id).Delete(models.Sub{}).Error; err != nil {
 		return err
 	}
-	err = tx.Delete(&mApp).Error
-	if err != nil {
-		tx.Rollback()
+	if err := tx.Delete(&mApp).Error; err != nil {
 		return err
 	}
 	return tx.Commit().Error
@@ -57,7 +56,7 @@ func (s store) ListApps() ([]storage.App, error) {
 	apps := []storage.App{}
 	err := s.db.Find(&apps).Error
 	if err != nil {
-		return []storage.App{}, err
+		return nil, err
 	}
 	return apps, nil
 }
@@ -67,7 +66,7 @@ func (s store) ListSubscribers(id string) ([]int64, error) {
 	subs := []models.Sub{}
 	err := s.db.Where("app_id = ?", id).Find(&subs).Error
 	if err != nil {
-		return []int64{}, err
+		return nil, err
 	}
 	for _, appSub := range subs {
 		chats = append(chats, appSub.ChatID)
@@ -94,18 +93,12 @@ func (s store) ListSubscribedApps(chatID int64) ([]storage.App, error) {
 }
 
 func (s store) Subscribe(chatID int64, appID string) error {
-	if s.checkChatAndApp(chatID, appID) {
-		return errors.New("Already Subscribed")
-	}
 	sub := models.Sub{ChatID: chatID, AppID: appID}
 	return s.db.Create(&sub).Error
 
 }
 
 func (s store) Unsubscribe(chatID int64, appID string) error {
-	if !s.checkChatAndApp(chatID, appID) {
-		return errors.New("Not Subscribed")
-	}
 	return s.db.Where("chat_id = ?", chatID).Where("app_id = ?", appID).Delete(&models.Sub{}).Error
 }
 
@@ -115,12 +108,4 @@ func (s store) UnsubscribeAll(chatID int64) error {
 
 func (s store) Close() error {
 	return s.db.Close()
-}
-
-func (s store) checkChatAndApp(chatID int64, appID string) bool {
-	sub := models.Sub{}
-	if err := s.db.Where("chat_id = ?", chatID).Where("app_id = ?", appID).First(&sub).Error; err != nil {
-		return false
-	}
-	return true
 }

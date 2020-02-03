@@ -29,11 +29,10 @@ func (a *App) FromStoreApp(app storage.App) error {
 
 // ToStoreApp is encoding models.App to storage.App
 func (a App) ToStoreApp() storage.App {
-	app := storage.App{
+	return storage.App{
 		ID:      strconv.FormatUint(uint64(a.ID), 10),
 		Name:    a.Name,
 		Secret:  a.Secret,
 		Private: a.Private,
 	}
-	return app
 }
