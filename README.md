@@ -60,6 +60,16 @@ And add admin usernames
 --env ANTENNA_ADMIN_USERNAMES="user1 user2"
 ```
 
+## Private model
+You can app update to private
+```bash
+app update -i {AppID} -p
+```
+Or return to public
+```bash
+app update -i {AppID} -p=false
+```
+
 # Push messages
 ```
 POST http://localhost:8080/antenna/{AppID}
