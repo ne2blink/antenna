@@ -53,7 +53,6 @@ You can open admin model
 ```bash
 --env ANTENNA_ADM_ENABLED=true
 ```
-If app private is true, Add this app need admin user
 
 And add admin usernames
 ```bash
