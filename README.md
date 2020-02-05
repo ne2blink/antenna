@@ -1,6 +1,32 @@
 # Antenna
 Antenna is a telegram bot implemented in Golang, broadcasting message to subscribers.
 
+# Quick start
+## Run with docker-compose.yml
+```yml
+version: '3'
+
+services:
+  db:
+    image: mariadb
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: antenna
+
+  antenna:
+    image: nerobb/antenna
+    command: serve
+    ports:
+      - "8080:8080"
+    links:
+      - db
+    environment:
+      ANTENNA_TELEGRAM_TOKEN: {Token}
+      ANTENNA_STORAGE_TYPE: mysql
+      ANTENNA_STORAGE_OPTIONS: '{"conn":"root:root@tcp(db)/antenna?charset=utf8"}'
+```
+{Token} replaced with self telegram bot token
+
 # Work with Go
 ## Build
 It is easy to build
