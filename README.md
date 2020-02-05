@@ -37,6 +37,15 @@ Enter the background to manage the application
 docker exec -it antenna_antenna_1 /bin/sh
 ```
 
+# Push messages
+```
+POST http://localhost:8080/antenna/{AppID}
+```
+Add header authorization
+```
+Authorization Basic {Base64(AppID:Secret)}
+```
+
 # Work with Go
 ## Build
 It is easy to build
@@ -103,13 +112,4 @@ app update -i {AppID} -p
 Or return to public
 ```bash
 app update -i {AppID} -p=false
-```
-
-# Push messages
-```
-POST http://localhost:8080/antenna/{AppID}
-```
-Add header authorization
-```
-Authorization Basic {Base64(AppID:Secret)}
 ```
