@@ -3,6 +3,7 @@ Antenna is a telegram bot implemented in Golang, broadcasting message to subscri
 
 # Quick start
 ## Run with docker-compose.yml
+File just like [docker-compose.yml](https://github.com/ne2blink/antenna/blob/master/docker-compose.yml)
 ```yml
 version: '3'
 
@@ -21,11 +22,20 @@ services:
     links:
       - db
     environment:
-      ANTENNA_TELEGRAM_TOKEN: {Token}
+      ANTENNA_TELEGRAM_TOKEN: ${Token}
       ANTENNA_STORAGE_TYPE: mysql
       ANTENNA_STORAGE_OPTIONS: '{"conn":"root:root@tcp(db)/antenna?charset=utf8"}'
 ```
-{Token} replaced with self telegram bot token
+
+Run antenna service
+```bash
+TOKEN={Telegram_bot_token} docker-compose up -d
+```
+
+Enter the background to manage the application
+```bash
+docker exec -it antenna_antenna_1 /bin/sh
+```
 
 # Work with Go
 ## Build
