@@ -22,7 +22,7 @@ services:
     links:
       - db
     environment:
-      ANTENNA_TELEGRAM_TOKEN: ${Token}
+      ANTENNA_TELEGRAM_TOKEN: ${TOKEN}
       ANTENNA_STORAGE_TYPE: mysql
       ANTENNA_STORAGE_OPTIONS: '{"conn":"root:root@tcp(db)/antenna?charset=utf8"}'
 ```
