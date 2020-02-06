@@ -1,0 +1,20 @@
+version: '3'
+
+services:
+  db:
+    image: mariadb
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: antenna
+
+  antenna:
+    image: nerobb/antenna
+    command: serve
+    ports:
+      - "12345:8080"
+    links:
+      - db
+    environment:
+      ANTENNA_TELEGRAM_TOKEN: ${TOKEN}
+      ANTENNA_STORAGE_TYPE: mysql
+      ANTENNA_STORAGE_OPTIONS: '{"conn":"root:root@tcp(db)/antenna?charset=utf8"}'
